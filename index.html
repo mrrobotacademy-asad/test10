@@ -1,0 +1,981 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>منصة كودجي - الاختبار الأسبوعي: أساسيات تقنية الواجهة الأمامية</title>
+    <style>
+        :root {
+            --bg-color: #0f0e17;
+            --card-bg: #161625;
+            --text-color: #fffffe;
+            --border-color: #2e2f42;
+            --accent-color: #6c5ce7;
+            --accent-glow: #a29bfe;
+            --success-color: #00b894;
+            --danger-color: #ff6b6b;
+            --warning-color: #fdcb6e;
+            --subtext-color: #a7a9be;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Cairo', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            direction: rtl;
+            padding-bottom: 50px;
+            line-height: 1.6;
+        }
+
+        .top-progress-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: rgba(255,255,255,0.1);
+            z-index: 1000;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent-color), var(--success-color));
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .timer-box {
+            position: fixed;
+            top: 15px;
+            left: 15px;
+            background: rgba(22,22,37,0.9);
+            border: 1px solid var(--accent-color);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: 700;
+            font-size: 0.9rem;
+            color: var(--accent-glow);
+            z-index: 999;
+            backdrop-filter: blur(5px);
+            display: none;
+            box-shadow: 0 4px 15px rgba(108,92,231,0.2);
+        }
+
+        .scroll-top {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            background: var(--accent-color);
+            color: #fff;
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            border: none;
+            cursor: pointer;
+            display: none;
+            z-index: 999;
+            font-size: 1.2rem;
+            box-shadow: 0 4px 15px rgba(108,92,231,0.4);
+            transition: transform 0.2s;
+        }
+        .scroll-top:hover { transform: scale(1.1); }
+
+        .copy-success {
+            position: fixed;
+            top: 20px;
+            right: 50%;
+            transform: translateX(50%);
+            background: var(--success-color);
+            color: #fff;
+            padding: 12px 25px;
+            border-radius: 30px;
+            font-weight: 700;
+            z-index: 2000;
+            display: none;
+            box-shadow: 0 5px 20px rgba(0,184,148,0.4);
+        }
+        .copy-success.show { display: block; animation: fadeInOut 4s ease forwards; }
+
+        @keyframes fadeInOut {
+            0% { opacity: 0; transform: translate(50%, -20px); }
+            15% { opacity: 1; transform: translate(50%, 0); }
+            85% { opacity: 1; transform: translate(50%, 0); }
+            100% { opacity: 0; transform: translate(50%, -20px); }
+        }
+
+        header {
+            background: linear-gradient(180deg, rgba(108,92,231,0.15) 0%, rgba(15,14,23,0) 100%);
+            border-bottom: 1px solid var(--border-color);
+            padding: 30px 20px;
+            margin-bottom: 30px;
+        }
+
+        .header-content {
+            max-width: 1000px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .logo-img, .instructor-img {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            border: 2px solid var(--accent-color);
+            object-fit: cover;
+            background: var(--card-bg);
+        }
+
+        .brand-text h1 {
+            font-size: 1.5rem;
+            color: #fff;
+            margin-bottom: 5px;
+            font-weight: 800;
+        }
+
+        .brand-text p {
+            color: var(--accent-glow);
+            font-size: 0.95rem;
+            font-weight: 600;
+        }
+
+        .header-badges {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .badge-ib {
+            background: rgba(108,92,231,0.2);
+            color: var(--accent-glow);
+            border: 1px solid var(--accent-color);
+            padding: 5px 12px;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: 700;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 0 15px;
+        }
+
+        .tab-nav {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 25px;
+            background: var(--card-bg);
+            padding: 8px;
+            border-radius: 16px;
+            border: 1px solid var(--border-color);
+            overflow-x: auto;
+        }
+
+        .tab-nav-btn {
+            flex: 1;
+            min-width: 120px;
+            padding: 12px 18px;
+            background: transparent;
+            border: none;
+            color: var(--subtext-color);
+            font-family: inherit;
+            font-weight: 700;
+            font-size: 0.95rem;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: center;
+            white-space: nowrap;
+        }
+
+        .tab-nav-btn:hover {
+            color: #fff;
+            background: rgba(255,255,255,0.05);
+        }
+
+        .tab-nav-btn.active {
+            background: var(--accent-color);
+            color: #fff;
+            box-shadow: 0 4px 15px rgba(108,92,231,0.3);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.4s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 18px;
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .card h2 {
+            font-size: 1.3rem;
+            color: #fff;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 12px;
+        }
+
+        .info-block {
+            background: rgba(108,92,231,0.1);
+            border-right: 4px solid var(--accent-color);
+            padding: 15px 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            font-size: 0.95rem;
+        }
+        .info-block.warning {
+            background: rgba(253,203,110,0.1);
+            border-right-color: var(--warning-color);
+        }
+        .info-block.success {
+            background: rgba(0,184,148,0.1);
+            border-right-color: var(--success-color);
+        }
+
+        .btn {
+            background: var(--accent-color);
+            color: #fff;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 12px;
+            font-family: inherit;
+            font-weight: 700;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        .btn:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(108,92,231,0.4);
+        }
+        .btn-secondary {
+            background: var(--border-color);
+            color: var(--text-color);
+        }
+        .btn-secondary:hover {
+            background: #3e3f58;
+            box-shadow: none;
+        }
+        .btn-success { background: var(--success-color); }
+        .btn-success:hover { box-shadow: 0 5px 15px rgba(0,184,148,0.4); }
+        .btn-warning { background: var(--warning-color); color: #0f0e17; }
+        .btn-sm { padding: 6px 14px; font-size: 0.85rem; border-radius: 8px; }
+
+        .btn-copy {
+            background: linear-gradient(135deg, #25D366 0%, #128C7E 100%);
+            color: #fff;
+            font-size: 1.1rem;
+            padding: 16px 30px;
+            width: 100%;
+            border-radius: 14px;
+            box-shadow: 0 6px 20px rgba(37,211,102,0.3);
+        }
+        .btn-copy:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(37,211,102,0.4);
+        }
+
+        .whatsapp-hint {
+            background: rgba(37,211,102,0.1);
+            border: 1px solid rgba(37,211,102,0.3);
+            border-radius: 12px;
+            padding: 12px 18px;
+            margin-top: 12px;
+            font-size: 0.85rem;
+            color: #25D366;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .question-text {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 20px;
+            line-height: 1.8;
+        }
+
+        .options-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 25px;
+        }
+
+        .option-item {
+            background: var(--bg-color);
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            padding: 14px 18px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 0.98rem;
+        }
+
+        .option-item:hover {
+            border-color: var(--accent-color);
+            background: rgba(108,92,231,0.05);
+        }
+
+        .option-item.correct {
+            border-color: var(--success-color);
+            background: rgba(0,184,148,0.15);
+            color: #fff;
+        }
+
+        .option-item.wrong {
+            border-color: var(--danger-color);
+            background: rgba(255,107,107,0.15);
+            color: #fff;
+        }
+
+        .option-item input[type="radio"] {
+            accent-color: var(--accent-color);
+            width: 18px;
+            height: 18px;
+        }
+
+        .nav-controls {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        .feedback-msg {
+            margin-top: 15px;
+            padding: 12px 18px;
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: 0.95rem;
+        }
+        .feedback-msg.correct { background: rgba(0,184,148,0.2); color: var(--success-color); }
+        .feedback-msg.wrong { background: rgba(255,107,107,0.2); color: var(--danger-color); }
+
+        .essay-box {
+            background: var(--bg-color);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 15px;
+        }
+
+        .essay-box textarea {
+            width: 100%;
+            min-height: 100px;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 12px;
+            color: var(--text-color);
+            font-family: inherit;
+            font-size: 0.95rem;
+            line-height: 1.7;
+            resize: vertical;
+        }
+        .essay-box textarea:focus {
+            outline: none;
+            border-color: var(--accent-color);
+        }
+
+        .report-details { margin-top: 20px; }
+        .q-item {
+            background: var(--bg-color);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 12px;
+            font-size: 0.95rem;
+        }
+        .q-num {
+            font-weight: 800;
+            color: var(--accent-glow);
+            margin-bottom: 5px;
+        }
+        .correct-ans { color: var(--success-color); font-weight: 700; }
+        .wrong-ans { color: var(--danger-color); font-weight: 700; }
+        .user-ans { color: var(--warning-color); font-weight: 600; white-space: pre-wrap; }
+
+        .certificate-box {
+            border: 3px dashed var(--accent-color);
+            background: rgba(108,92,231,0.05);
+            border-radius: 20px;
+            padding: 30px;
+            text-align: center;
+            margin-top: 30px;
+        }
+        .certificate-box h2 {
+            justify-content: center;
+            border: none;
+            color: var(--warning-color);
+            font-size: 1.8rem;
+        }
+        .certificate-box .student-name {
+            font-size: 1.5rem;
+            color: #fff;
+            font-weight: 800;
+            margin: 15px 0;
+            text-decoration: underline;
+        }
+        .certificate-box .cert-score {
+            font-size: 1.2rem;
+            color: var(--success-color);
+            font-weight: 700;
+            margin-top: 10px;
+        }
+
+        .badge-accent {
+            background: var(--accent-color);
+            color: #fff;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 0.85rem;
+            font-weight: 700;
+        }
+
+        @media (max-width:768px) {
+            .header-content { flex-direction:column; gap:10px; }
+            .brand-text h1 { font-size:1.3rem; }
+            .logo-img, .instructor-img { width:60px; height:60px; }
+            .card { padding:15px; }
+            .timer-box { top:50px; left:10px; padding:5px 12px; font-size:0.75rem; }
+            .tab-nav .tab-nav-btn { min-width:60px; padding:8px 12px; font-size:0.8rem; }
+            .nav-controls .btn { padding:8px 15px; font-size:0.85rem; }
+            .question-text { font-size:1rem; }
+            .btn-copy { font-size:0.95rem; padding:14px 20px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="top-progress-bar"><div class="progress-fill" id="progress-fill"></div></div>
+<div class="timer-box" id="timer-box">⏱️ <span id="timer-display">90:00</span></div>
+<button class="scroll-top" id="scroll-top" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
+<div class="copy-success" id="copy-success">✅ تم نسخ التقرير إلى الحافظة!</div>
+
+<header>
+    <div class="header-content">
+        <div class="logo-section">
+            <img src="logo1.png" alt="لوجو كودجي" class="logo-img" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Ctext y=%22.9em%22 font-size=%2290%22%3E🧠%3C/text%3E%3C/svg%3E'">
+            <div class="brand-text">
+                <h1>🧠 منصة كودجي - مهندس: اندرو مجدي</h1>
+                <p>الاختبار الأسبوعي: الدرس الثالث - أساسيات تقنية الواجهة الأمامية (الوحدة الثالثة)</p>
+            </div>
+            <img src="logo2.png" alt="المهندس أندرو" class="instructor-img" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Ctext y=%22.9em%22 font-size=%2290%22%3E👨‍🏫%3C/text%3E%3C/svg%3E'">
+        </div>
+        <div class="header-badges">
+            <span class="badge-ib">🌐 الوحدة الثالثة</span>
+            <span class="badge-ib">💻 الدرس الثالث</span>
+            <span class="badge-ib">📝 اختبار أسبوعي</span>
+        </div>
+    </div>
+</header>
+
+<div class="container">
+    <div class="tab-nav" id="main-tabs">
+        <button class="tab-nav-btn" data-tab="instructions" onclick="switchMainTab('instructions')">📖 تعليمات</button>
+        <button class="tab-nav-btn active" data-tab="quiz" onclick="switchMainTab('quiz')">📝 الاختبار الأسبوعي</button>
+        <button class="tab-nav-btn" data-tab="result" onclick="switchMainTab('result')">🏆 النتيجة</button>
+    </div>
+
+    <!-- تبويب التعليمات -->
+    <div class="tab-content" id="tab-instructions">
+        <section class="card">
+            <h2>📖 تعليمات الاختبار الأسبوعي</h2>
+            <div class="info-block warning">
+                <p style="font-size:1.05rem;line-height:2;">
+                    <strong>📌 مكونات الاختبار:</strong><br>
+                    • <strong>15 سؤال اختيار من متعدد</strong> (مستخرجة من كتاب التقييمات والكتاب المدرسي)<br>
+                    • <strong>8 أسئلة مقالية</strong> (تغطي تقنيات الواجهة الأمامية وتطبيقاتها)<br><br>
+
+                    <strong>⏱️ مدة الاختبار:</strong> 90 دقيقة<br>
+                    <strong>✅ عدد الأسئلة الكلي:</strong> 23 سؤالاً<br><br>
+
+                    <strong>📝 التعليمات:</strong><br>
+                    1. ادخل اسمك الثلاثي لتبدأ الاختبار.<br>
+                    2. اختر الإجابة الصحيحة لكل سؤال اختياري، واكتب إجابات الأسئلة المقالية في المربعات المخصصة.<br>
+                    3. يمكنك الضغط على "تحقق" لمراجعة كل سؤال اختياري.<br>
+                    4. عند الانتهاء، اضغط "تأكيد إنهاء الاختبار وإرسال الإجابات" للحصول على النتيجة والتقرير المنسق للواتساب.
+                </p>
+            </div>
+            <button class="btn" style="width:100%;padding:14px;margin-top:10px;" onclick="switchMainTab('quiz')">🚀 ابدأ الاختبار الآن</button>
+        </section>
+    </div>
+
+    <!-- تبويب الاختبار -->
+    <div class="tab-content active" id="tab-quiz">
+        <section class="card" id="quiz-setup">
+            <h2>📝 الاختبار الأسبوعي - الدرس الثالث (أساسيات تقنية الواجهة الأمامية)</h2>
+            <p style="color:var(--subtext-color);">15 سؤال اختيار من متعدد + 8 أسئلة مقالية (من المصادر الرسمية).</p>
+            <div style="margin:15px 0;">
+                <label style="display:block;margin-bottom:6px;font-weight:700;">👤 اسمك الثلاثي:</label>
+                <input type="text" id="student-name-input" placeholder="اكتب اسمك هنا..." style="width:100%;padding:12px;background:var(--bg-color);border:1px solid var(--border-color);border-radius:8px;color:#fff;font-size:1rem;">
+            </div>
+            <button class="btn" style="width:100%;padding:14px;" onclick="startQuiz()">🚀 ابدأ الاختبار الآن</button>
+        </section>
+
+        <section class="card" id="quiz-container" style="display:none;">
+            <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">
+                <h2 id="question-title" style="color:#fffffe;">السؤال 1</h2>
+                <span class="badge-accent" id="quiz-progress">1 من 23</span>
+            </div>
+            <div id="dynamic-quiz-area"></div>
+            <div id="feedback-area"></div>
+            <div class="nav-controls">
+                <button class="btn btn-secondary" id="prev-quiz" onclick="navigateQuiz(-1)">السابق</button>
+                <button class="btn" id="check-btn" style="background:var(--accent-color);" onclick="checkCurrentAnswer()">🔍 تحقق</button>
+                <button class="btn btn-secondary" id="next-quiz" onclick="navigateQuiz(1)">التالي</button>
+            </div>
+            <button class="btn btn-success" style="width:100%;margin-top:20px;padding:14px;" onclick="submitQuiz()">✔ تأكيد إنهاء الاختبار وإرسال الإجابات</button>
+        </section>
+    </div>
+
+    <!-- تبويب النتيجة -->
+    <div class="tab-content" id="tab-result">
+        <section class="card" id="result-container" style="display:none;">
+            <h2>🎉 نتيجة الاختبار</h2>
+            <p id="score-summary" style="color:var(--subtext-color);font-size:1.1rem;line-height:2;"></p>
+            <div id="report-details-container" class="report-details"></div>
+            <div class="certificate-box" id="certificate">
+                <h2>📜 شهادة إتمام</h2>
+                <p>تشهد منصة كودجي بأن الطالب/الطالبة:</p>
+                <div class="student-name" id="cert-name">—</div>
+                <p>قد أتم بنجاح الاختبار الأسبوعي لـ <b>الدرس الثالث: أساسيات تقنية الواجهة الأمامية (الوحدة الثالثة)</b></p>
+                <p class="cert-score" id="cert-score">🌟 النتيجة: 0%</p>
+                <div style="margin-top:25px;font-size:0.85rem;color:var(--subtext-color);">📅 تم التقييم آلياً بواسطة منصة كودجي 🤖</div>
+            </div>
+
+            <div style="margin-top:25px;">
+                <button class="btn btn-copy" onclick="copyReportToClipboard()">
+                    📋 انسخ التقرير وارسله عبر الواتساب لمهندس أندرو 01285529570
+                </button>
+                <div class="whatsapp-hint">
+                    <span>💡</span>
+                    بعد الضغط على الزر، اذهب إلى واتساب وألصق التقرير (Paste) وأرسله للمهندس أندرو
+                </div>
+            </div>
+
+            <div style="display:flex;gap:12px;flex-wrap:wrap;justify-content:center;margin-top:20px;">
+                <button class="btn btn-secondary" onclick="location.reload()">🔄 إعادة الاختبار</button>
+            </div>
+        </section>
+    </div>
+</div>
+
+<script>
+    // ============================================================
+    // بيانات أسئلة الاختبار الأسبوعي (الدرس الثالث - الوحدة الثالثة)
+    // 15 سؤال اختياري + 8 أسئلة مقالية
+    // ============================================================
+    const mcqQuestions = [
+        { q: "ما التقنية المسؤولة عن بناء البنية والهيكل الأساسي لصفحة الويب (مثل العناوين والفقرات والروابط)؟",
+          opts: ["CSS", "HTML", "JavaScript", "SQL"], ans: 1 },
+        { q: "أي مما يلي يُعد مثالاً على عناصر لغة HTML الداللية (Semantic HTML)؟",
+          opts: ["E-mail", "div", "main", "span"], ans: 2 },
+        { q: "التقنية المُستخدمة لتحديد المظهر والتنسيق البصري لصفحة الويب (كالخطوط والألوان والتخطيط) هي:",
+          opts: ["HTML", "CSS", "JavaScript", "JSON"], ans: 1 },
+        { q: "تُضيف لغة JavaScript إلى صفحة الويب:",
+          opts: ["العناوين والفقرات", "الألوان والتنسيقات", "السلوك والتفاعلية والحركية", "التشفير وقواعد البيانات"], ans: 2 },
+        { q: "العنصر الدلالي header في لغة HTML يُستخدم مخصصاً لـ:",
+          opts: ["المحتوى الرئيسي للمستند", "روابط التنقل بين الصفحات", "رأس الصفحة أو القسم العلوي", "تذييل أسفل الصفحة"], ans: 2 },
+        { q: "ما المقصود بمفهوم التصميم المتجاوب (Responsive Design)؟",
+          opts: [
+            "جعل الصفحة تعمل فقط على أجهزة الكمبيوتر المكتبية",
+            "ضبط وتكييف تخطيط الصفحة تلقائياً ليتناسب مع مختلف أحجام الشاشات",
+            "استخدام لغة JavaScript فقط لمعالجة البيانات",
+            "تسريع استجابة قاعدة البيانات للطلبات"
+          ], ans: 1 },
+        { q: "تُستخدم مكتبة React في تطوير الواجهات الأمامية لـ:",
+          opts: [
+            "بناء واجهات المستخدم بمكونات قابلة لإعادة الاستخدام (Reusable Components)",
+            "إدارة وتخزين بيانات المستخدمين",
+            "تشفير الاتصال عبر خادم الويب",
+            "معالجة العمليات الحسابية والمعادلات"
+          ], ans: 0 },
+        { q: "إطار العمل المتقدم المبني على مكتبة React والذي يوفر التوجيه وطرق عرض الصفحات هو:",
+          opts: ["Vue", "Next.js", "CSS", "SQL"], ans: 1 },
+        { q: "أي من عناصر HTML الداللية التالية يُستخدم لتحديد قسم روابط التنقل الرئيسية في الموقع؟",
+          opts: ["header", "footer", "main", "nav"], ans: 3 },
+        { q: "نهج 'الأولوية للجوال (Mobile-First)' في التصميم المتجاوب يعني:",
+          opts: [
+            "تصميم الواجهة للشاشات كبيرة الحجم أولاً ثم تصغيرها",
+            "تصميم الواجهة للشاشات الصغيرة مثل الهواتف أولاً ثم التوسع للشاشات الأكبر",
+            "استغناء التطبيق عن لغة CSS بالكامل",
+            "تشغيل الصفحة بدون الاتصال بمتصفح الويب"
+          ], ans: 1 },
+        { q: "العنصر footer في لغة HTML الداللية يُستخدم لـ:",
+          opts: ["عرض المحتوى الرئيسي", "عرض التذييل في أسفل الصفحة", "عرض شريط البحث", "التنقل بين الصفحات"], ans: 1 },
+        { q: "أي من اللغات التالية تُستخدم للتحقق من صحة المدخلات في النماذج وتحديث محتوى الشاشة فورياً؟",
+          opts: ["HTML", "CSS", "JavaScript", "PHP"], ans: 2 },
+        { q: "ما الفائدة الرئيسية لاستخدام لغة HTML الداللية بالنسبة لبرامج قارئ الشاشة ومحركات البحث (SEO)؟",
+          opts: [
+            "زيادة ألوان الصفحة وجعلها برّاقة",
+            "تسهيل فهم بنية ومعنى محتوى الصفحة وتمكين ذوي الاحتياجات الخاصة ومحركات البحث من قراءتها",
+            "إلغاء الحاجة لربط الصفحة بالخادم",
+            "تشفير الكود البرمجي لحمايته"
+          ], ans: 1 },
+        { q: "أي من أطر عمل JavaScript التالية يمتلك بنية بسيطة ويتيح بناء التطبيقات تدريجياً؟",
+          opts: ["Vue", "Next.js", "React", "Docker"], ans: 0 },
+        { q: "في تشبيه المبنى، التقنية التي تُشبه 'شبكات التوصيل التفاعلية والكهرباء' داخل المبنى هي:",
+          opts: ["HTML", "CSS", "JavaScript", "SQL"], ans: 2 }
+    ];
+
+    const essayQuestions = [
+        { q: "اشرح بالتفصيل التكامل والفرق الأساسي بين أدوار HTML وCSS وJavaScript في بناء صفحة ويب متكاملة." },
+        { q: "لماذا تُعتبر لغة HTML الداللية (Semantic HTML) مهمة عند بناء الواجهات الحديثة؟ اذكر مثالين لعناصر داللية مع توضيح وظيفتهما." },
+        { q: "وضح كيف يُساهم التصميم المتجاوب (Responsive Design) في تحسين تجربة المستخدم عبر الشاشات المختلفة." },
+        { q: "ما الفائدة التي يكتسبها مطور الواجهات الأمامية عند استخدام إطار عمل (Framework) أو مكتبة برمجية مقارنة بالبرمجة التقليدية؟" },
+        { q: "اذكر مثالاً لعنصر HTML داللي ووضح كيف يُساهم في تحسين إمكانية الوصول (Accessibility) لذوي الاحتياجات الخاصة." },
+        { q: "ناقش كيف تسهم لغة CSS في تحسين المظهر البصري لصفحة الويب وتوزيع عناصرها بشكل جذاب." },
+        { q: "قارن بين مكتبة React وإطار العمل Next.js من حيث الخصائص ونطاق الاستخدام." },
+        { q: "لماذا يُعتبر نهج 'الأولوية للجوال (Mobile-First)' حاسماً ومهماً في تصميم تطبيقات الويب الحديثة؟" }
+    ];
+
+    // ============================================================
+    // متغيرات الحالة
+    // ============================================================
+    let studentName = '';
+    let currentQuizIndex = 0; // 0..22 (0..14 MCQ, 15..22 Essay)
+    const totalQuestions = mcqQuestions.length + essayQuestions.length; // 23
+    let mcqAnswers = new Array(mcqQuestions.length).fill(null);
+    let essayAnswers = new Array(essayQuestions.length).fill('');
+    let quizTimer = null;
+    let timeLeft = 5400; // 90 minutes
+
+    // ============================================================
+    // إدارة التبويبات والتنقل
+    // ============================================================
+    function switchMainTab(tab) {
+        document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+        document.getElementById('tab-' + tab).classList.add('active');
+        document.querySelectorAll('.tab-nav-btn').forEach(el => el.classList.remove('active'));
+        document.querySelector(`.tab-nav-btn[data-tab="${tab}"]`).classList.add('active');
+    }
+
+    function updateProgressBar() {
+        let answeredCount = 0;
+        mcqAnswers.forEach(ans => { if (ans !== null) answeredCount++; });
+        essayAnswers.forEach(ans => { if ((ans || '').trim().length >= 5) answeredCount++; });
+        const pct = Math.min(100, (answeredCount / totalQuestions) * 100);
+        document.getElementById('progress-fill').style.width = pct + '%';
+    }
+
+    function startQuiz() {
+        const nameInput = document.getElementById('student-name-input');
+        if (!nameInput || !nameInput.value.trim()) {
+            alert('⚠️ برجاء كتابة اسمك الثلاثي لتبدأ الاختبار الأسبوعي');
+            return;
+        }
+        studentName = nameInput.value.trim();
+        document.getElementById('quiz-setup').style.display = 'none';
+        document.getElementById('quiz-container').style.display = 'block';
+        document.getElementById('timer-box').style.display = 'block';
+
+        if (quizTimer) clearInterval(quizTimer);
+        timeLeft = 5400;
+        quizTimer = setInterval(function() {
+            timeLeft--;
+            let mins = Math.floor(timeLeft / 60);
+            let secs = timeLeft % 60;
+            document.getElementById('timer-display').textContent =
+                (mins < 10 ? '0' + mins : mins) + ':' + (secs < 10 ? '0' + secs : secs);
+            if (timeLeft <= 0) {
+                clearInterval(quizTimer);
+                alert('⏰ انتهى وقت الاختبار! سيتم تجميع وتسليم الإجابات تلقائياً.');
+                submitQuiz();
+            }
+        }, 1000);
+
+        loadQuestion(0);
+    }
+
+    function loadQuestion(index) {
+        currentQuizIndex = index;
+        document.getElementById('question-title').textContent = `السؤال ${index + 1} من ${totalQuestions}`;
+        document.getElementById('quiz-progress').textContent = `${index + 1} من ${totalQuestions}`;
+
+        const area = document.getElementById('dynamic-quiz-area');
+        const feedbackArea = document.getElementById('feedback-area');
+        const checkBtn = document.getElementById('check-btn');
+        feedbackArea.innerHTML = '';
+
+        if (index < mcqQuestions.length) {
+            // MCQ Question
+            checkBtn.style.display = 'inline-flex';
+            const q = mcqQuestions[index];
+            let html = `<div class="question-text"><span class="badge-accent">اختياري</span> ${q.q}</div>`;
+            html += `<ul class="options-list">`;
+            q.opts.forEach((opt, oi) => {
+                const checked = mcqAnswers[index] === oi ? 'checked' : '';
+                html += `
+                    <li class="option-item" onclick="selectMcqOption(${index}, ${oi})" id="opt-item-${oi}">
+                        <input type="radio" name="mcq-${index}" id="mcq-radio-${oi}" value="${oi}" ${checked}>
+                        <label for="mcq-radio-${oi}" style="cursor:pointer;width:100%;display:block;">${opt}</label>
+                    </li>
+                `;
+            });
+            html += `</ul>`;
+            area.innerHTML = html;
+        } else {
+            // Essay Question
+            checkBtn.style.display = 'none';
+            const essayIdx = index - mcqQuestions.length;
+            const q = essayQuestions[essayIdx];
+            const currentVal = essayAnswers[essayIdx] || '';
+            let html = `
+                <div class="question-text"><span class="badge-accent" style="background:#fdcb6e;color:#000;">مقالي</span> ${q.q}</div>
+                <div class="essay-box">
+                    <textarea id="essay-input-${essayIdx}" placeholder="اكتب إجابتك النموذجية والمفصلة هنا..." oninput="updateEssayAnswer(${essayIdx}, this.value)">${currentVal}</textarea>
+                </div>
+            `;
+            area.innerHTML = html;
+        }
+
+        document.getElementById('prev-quiz').disabled = (index === 0);
+        document.getElementById('next-quiz').disabled = (index === totalQuestions - 1);
+        updateProgressBar();
+    }
+
+    function selectMcqOption(qIndex, optIdx) {
+        mcqAnswers[qIndex] = optIdx;
+        document.querySelectorAll('#dynamic-quiz-area .option-item').forEach(item => {
+            item.classList.remove('correct', 'wrong');
+        });
+        document.getElementById('feedback-area').innerHTML = '';
+        updateProgressBar();
+    }
+
+    function updateEssayAnswer(essayIdx, val) {
+        essayAnswers[essayIdx] = val;
+        updateProgressBar();
+    }
+
+    function checkCurrentAnswer() {
+        if (currentQuizIndex >= mcqQuestions.length) return;
+        const q = mcqQuestions[currentQuizIndex];
+        const selected = mcqAnswers[currentQuizIndex];
+        const fb = document.getElementById('feedback-area');
+
+        if (selected === null || selected === undefined) {
+            fb.innerHTML = `<div class="feedback-msg wrong">⚠️ لم تختر إجابة بعد.</div>`;
+            return;
+        }
+
+        const correct = (selected === q.ans);
+        document.querySelectorAll('#dynamic-quiz-area .option-item').forEach((item, idx) => {
+            item.classList.remove('correct', 'wrong');
+            if (idx === q.ans) item.classList.add('correct');
+            else if (idx === selected && !correct) item.classList.add('wrong');
+        });
+
+        if (correct) {
+            fb.innerHTML = `<div class="feedback-msg correct">🎉 إجابة صحيحة! أحسنت.</div>`;
+        } else {
+            fb.innerHTML = `<div class="feedback-msg wrong">❌ إجابة خاطئة. الإجابة الصحيحة هي: ${q.opts[q.ans]}</div>`;
+        }
+    }
+
+    function navigateQuiz(delta) {
+        const newIndex = currentQuizIndex + delta;
+        if (newIndex >= 0 && newIndex < totalQuestions) {
+            loadQuestion(newIndex);
+        }
+    }
+
+    function submitQuiz() {
+        clearInterval(quizTimer);
+        document.getElementById('timer-box').style.display = 'none';
+
+        // Calculate scores
+        let mcqCorrect = 0;
+        let mcqAnswered = 0;
+        mcqQuestions.forEach((q, idx) => {
+            if (mcqAnswers[idx] !== null) mcqAnswered++;
+            if (mcqAnswers[idx] === q.ans) mcqCorrect++;
+        });
+
+        let essayAnswered = 0;
+        essayAnswers.forEach(ans => { if ((ans || '').trim().length >= 5) essayAnswered++; });
+
+        const mcqPercent = Math.round((mcqCorrect / mcqQuestions.length) * 100);
+        const essayPercent = Math.round((essayAnswered / essayQuestions.length) * 100);
+        const overallScore = Math.round((mcqPercent + essayPercent) / 2);
+
+        document.getElementById('score-summary').innerHTML = `
+            📊 <b style="color:#fff;">النتيجة الإجمالية للاختبار:</b> ${overallScore}%<br>
+            📝 الاختياري: ${mcqCorrect}/${mcqQuestions.length} (${mcqPercent}%)<br>
+            ✍️ المقالي: تم الإجابة على ${essayAnswered} من ${essayQuestions.length} سؤال (${essayPercent}%)<br>
+            <span style="font-size:0.9rem;opacity:0.8;">تم تسليم الاختبار وتحليله آلياً</span>
+        `;
+
+        let reportHTML = `<h3 style="color:#fff;">📋 التقرير المفصل للاختبار</h3>`;
+
+        reportHTML += `<h4 style="color:var(--accent-glow);margin:15px 0 10px 0;">📝 الجزء الأول: الاختياري (${mcqQuestions.length} سؤال)</h4>`;
+        mcqQuestions.forEach((q, idx) => {
+            const userAns = mcqAnswers[idx];
+            const isCorrect = (userAns === q.ans);
+            const correctText = q.opts[q.ans];
+            const userText = (userAns !== null) ? q.opts[userAns] : 'لم يُجب';
+            reportHTML += `
+                <div class="q-item">
+                    <div class="q-num">س${idx + 1}:</div>
+                    <div>${q.q}</div>
+                    <div>📌 الإجابة الصحيحة: <span class="correct-ans">${correctText}</span></div>
+                    <div>👤 إجابتك: <span class="${isCorrect ? 'correct-ans' : 'wrong-ans'}">${userText}</span> ${isCorrect ? '✅' : '❌'}</div>
+                </div>
+            `;
+        });
+
+        reportHTML += `<h4 style="color:#fdcb6e;margin:20px 0 10px 0;">✍️ الجزء الثاني: المقالي (${essayQuestions.length} سؤال)</h4>`;
+        essayQuestions.forEach((q, idx) => {
+            const answer = essayAnswers[idx] || 'لم يُجب';
+            reportHTML += `
+                <div class="q-item">
+                    <div class="q-num">س${idx + 1}:</div>
+                    <div>${q.q}</div>
+                    <div>👤 إجابتك: <span class="user-ans">${answer}</span></div>
+                </div>
+            `;
+        });
+
+        document.getElementById('report-details-container').innerHTML = reportHTML;
+        document.getElementById('cert-name').textContent = studentName || 'طالب منصة كودجي';
+        document.getElementById('cert-score').textContent = `🌟 النتيجة الإجمالية: ${overallScore}%`;
+
+        window._resultData = {
+            mcqCorrect, mcqAnswered, mcqTotal: mcqQuestions.length, mcqPercent,
+            essayAnswered, essayTotal: essayQuestions.length, essayPercent, overallScore
+        };
+
+        document.getElementById('result-container').style.display = 'block';
+        switchMainTab('result');
+    }
+
+    function copyReportToClipboard() {
+        const data = window._resultData || {};
+        let lines = [];
+        lines.push(`مرحباً مهندس أندرو 👋`);
+        lines.push('');
+        lines.push(`الطالب/الطالبة: ${studentName || 'طالب منصة كودجي'}`);
+        lines.push(`الاختبار الأسبوعي: الدرس الثالث - أساسيات تقنية الواجهة الأمامية (الوحدة الثالثة)`);
+        lines.push(`📊 النتيجة الإجمالية: ${data.overallScore || 0}%`);
+        lines.push('');
+        lines.push(`📝 الاختياري: ${data.mcqCorrect || 0}/${data.mcqTotal || 0} (${data.mcqPercent || 0}%)`);
+        lines.push(`✍️ المقالي: ${data.essayAnswered || 0}/${data.essayTotal || 0} (${data.essayPercent || 0}%)`);
+        lines.push('');
+        lines.push(`━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`);
+        lines.push(`📝 إجابات الاختياري:`);
+        lines.push(`━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`);
+        mcqQuestions.forEach((q, idx) => {
+            const userAns = mcqAnswers[idx];
+            const isCorrect = (userAns === q.ans);
+            const correctText = q.opts[q.ans];
+            const userText = (userAns !== null) ? q.opts[userAns] : 'لم يُجب';
+            lines.push(`س${idx + 1}: ${q.q}`);
+            lines.push(`   الصحيح: ${correctText} | إجابتي: ${userText} ${isCorrect ? '✅' : '❌'}`);
+        });
+        lines.push('');
+        lines.push(`━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`);
+        lines.push(`✍️ إجابات المقالي:`);
+        lines.push(`━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`);
+        essayQuestions.forEach((q, idx) => {
+            const answer = essayAnswers[idx] || 'لم يُجب';
+            lines.push(`س${idx + 1}: ${q.q}`);
+            lines.push(`   إجابتي: ${answer}`);
+        });
+        lines.push('');
+        lines.push(`تم التقييم بواسطة منصة كودجي 🤖`);
+        lines.push(`📅 ${new Date().toLocaleDateString('ar-EG')}`);
+
+        const fullReport = lines.join('\n');
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(fullReport).then(showCopySuccess).catch(() => fallbackCopy(fullReport));
+        } else {
+            fallbackCopy(fullReport);
+        }
+    }
+
+    function fallbackCopy(text) {
+        const ta = document.createElement('textarea');
+        ta.value = text;
+        ta.style.position = 'fixed';
+        ta.style.opacity = '0';
+        document.body.appendChild(ta);
+        ta.select();
+        try { document.execCommand('copy'); showCopySuccess(); } catch (e) { alert('❌ فشل النسخ'); }
+        document.body.removeChild(ta);
+    }
+
+    function showCopySuccess() {
+        const el = document.getElementById('copy-success');
+        el.classList.add('show');
+        setTimeout(() => el.classList.remove('show'), 4000);
+    }
+
+    window.addEventListener('scroll', function() {
+        const btn = document.getElementById('scroll-top');
+        if (window.scrollY > 400) btn.style.display = 'block';
+        else btn.style.display = 'none';
+    });
+
+    window.addEventListener('DOMContentLoaded', function() {
+        switchMainTab('instructions');
+    });
+
+    window.switchMainTab = switchMainTab;
+    window.startQuiz = startQuiz;
+    window.selectMcqOption = selectMcqOption;
+    window.updateEssayAnswer = updateEssayAnswer;
+    window.checkCurrentAnswer = checkCurrentAnswer;
+    window.navigateQuiz = navigateQuiz;
+    window.submitQuiz = submitQuiz;
+    window.copyReportToClipboard = copyReportToClipboard;
+</script>
+
+</body>
+</html>
